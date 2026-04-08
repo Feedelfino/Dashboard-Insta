@@ -1,0 +1,4 @@
+__pycache__/                             # ignora pastas de cache do Python
+*.pyc                                    # ignora arquivos compilados do Python
+.venv/                                   # ignora ambiente virtual Python
+.env                                     # ignora arquivos de variáveis de ambiente
