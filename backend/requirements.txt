@@ -1,0 +1,6 @@
+fastapi==0.111.0            # framework web do backend; cria rotas, recebe requisições e devolve respostas
+uvicorn==0.30.1             # servidor que executa a aplicação FastAPI
+python-dotenv==1.0.1        # lê variáveis do arquivo .env e carrega para o projeto
+pydantic==2.7.1             # valida e organiza os dados da aplicação
+pydantic-settings==2.2.1    # permite ler configurações do projeto a partir de variáveis de ambiente
+httpx==0.27.0               # biblioteca para fazer requisições HTTP para APIs externas, como a da Meta
