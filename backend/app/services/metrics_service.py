@@ -1,25 +1,31 @@
-from app.database import conectar_db                 # importa a função de conexão com o banco
-from app.models.metrics import MetricasResponse      # importa o model principal da resposta
-from app.models.metrics import Engajamento           # importa o model interno de engajamento
-from app.models.metrics import MetricasCreate        # importa o model de entrada para criação
+# importa a função de conexão com o banco
+from app.database import conectar_db
+# importa o model principal da resposta
+from app.models.metrics import MetricasResponse
+# importa o model interno de engajamento
+from app.models.metrics import Engajamento
+# importa o model de entrada para criação
+from app.models.metrics import MetricasCreate
 
 
-def buscar_metricas():                               # define a função que busca métricas no banco
-    conn = conectar_db()                             # abre conexão com o banco
-    cursor = conn.cursor()                           # cria cursor para executar SQL
+def buscar_metricas():                                 # define a função que busca a métrica mais recente
+    conn = conectar_db()                               # abre conexão com o banco
+    # cria cursor para executar SQL
+    cursor = conn.cursor()
 
     cursor.execute("""
     SELECT seguidores, alcance, impressoes, curtidas, comentarios, salvamentos
     FROM metrics
     ORDER BY id DESC
     LIMIT 1
-    """)
+    """)                                               # busca o registro mais recente
 
-    registro = cursor.fetchone()                     # pega uma única linha do resultado
-    conn.close()                                     # fecha a conexão com o banco
+    # pega uma única linha do resultado
+    registro = cursor.fetchone()
+    conn.close()                                       # fecha conexão com o banco
 
-    if registro is None:                             # verifica se não existe dado salvo
-        return MetricasResponse(                     # retorna uma resposta vazia padronizada
+    if registro is None:                               # verifica se não há registros
+        return MetricasResponse(                       # retorna resposta vazia padronizada
             seguidores=0,
             alcance=0,
             impressoes=0,
@@ -30,21 +36,22 @@ def buscar_metricas():                               # define a função que bus
             )
         )
 
-    return MetricasResponse(                         # monta e retorna a resposta usando os dados do banco
-        seguidores=registro["seguidores"],           # pega seguidores da linha retornada
-        alcance=registro["alcance"],                 # pega alcance da linha retornada
-        impressoes=registro["impressoes"],           # pega impressões da linha retornada
-        engajamento=Engajamento(                     # monta o bloco de engajamento
-            curtidas=registro["curtidas"],           # pega curtidas da linha retornada
-            comentarios=registro["comentarios"],     # pega comentários da linha retornada
-            salvamentos=registro["salvamentos"]      # pega salvamentos da linha retornada
+    return MetricasResponse(                           # monta a resposta com o registro encontrado
+        seguidores=registro["seguidores"],
+        alcance=registro["alcance"],
+        impressoes=registro["impressoes"],
+        engajamento=Engajamento(
+            curtidas=registro["curtidas"],
+            comentarios=registro["comentarios"],
+            salvamentos=registro["salvamentos"]
         )
     )
 
 
-def salvar_metricas(dados: MetricasCreate):          # define função que salva métricas no banco
-    conn = conectar_db()                             # abre conexão com o banco
-    cursor = conn.cursor()                           # cria cursor para executar SQL
+# define função que salva métricas no banco
+def salvar_metricas(dados: MetricasCreate):
+    conn = conectar_db()                              # abre conexão com o banco
+    cursor = conn.cursor()                            # cria cursor para executar SQL
 
     cursor.execute("""
     INSERT INTO metrics (
@@ -53,17 +60,52 @@ def salvar_metricas(dados: MetricasCreate):          # define função que salva
     )
     VALUES (?, ?, ?, ?, ?, ?)
     """, (
-        dados.seguidores,                            # usa o valor de seguidores recebido
-        dados.alcance,                               # usa o valor de alcance recebido
-        dados.impressoes,                            # usa o valor de impressões recebido
-        dados.curtidas,                              # usa o valor de curtidas recebido
-        dados.comentarios,                           # usa o valor de comentários recebido
-        dados.salvamentos                            # usa o valor de salvamentos recebido
-    ))
+        dados.seguidores,
+        dados.alcance,
+        dados.impressoes,
+        dados.curtidas,
+        dados.comentarios,
+        dados.salvamentos
+    ))                                                # insere os dados recebidos
 
-    conn.commit()                                    # salva a inserção no banco
-    conn.close()                                     # fecha conexão
+    conn.commit()                                     # salva inserção
+    conn.close()                                      # fecha conexão
 
-    return {                                         # devolve confirmação
+    return {
         "mensagem": "Métricas salvas com sucesso"
-    }
+    }                                                 # devolve confirmação simples
+
+
+# define função que busca o histórico de métricas
+def buscar_historico(limit: int = 10):
+    conn = conectar_db()                              # abre conexão com o banco
+    cursor = conn.cursor()                            # cria cursor para executar SQL
+
+    cursor.execute("""
+    SELECT seguidores, alcance, impressoes, curtidas, comentarios, salvamentos
+    FROM metrics
+    ORDER BY id DESC
+    LIMIT ?
+    """, (limit,))                                    # busca os últimos registros limitados pelo parâmetro
+
+    registros = cursor.fetchall()                     # pega várias linhas
+    conn.close()                                      # fecha conexão
+
+    # lista que vai armazenar os resultados
+    resultado = []
+
+    for registro in registros:                        # percorre cada linha retornada
+        resultado.append(
+            MetricasResponse(
+                seguidores=registro["seguidores"],
+                alcance=registro["alcance"],
+                impressoes=registro["impressoes"],
+                engajamento=Engajamento(
+                    curtidas=registro["curtidas"],
+                    comentarios=registro["comentarios"],
+                    salvamentos=registro["salvamentos"]
+                )
+            )
+        )
+
+    return resultado                                  # devolve a lista de métricas
