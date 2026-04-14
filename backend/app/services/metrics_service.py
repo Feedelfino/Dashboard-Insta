@@ -14,7 +14,7 @@ def buscar_metricas():                                 # define a função que b
     cursor = conn.cursor()
 
     cursor.execute("""
-    SELECT seguidores, alcance, impressoes, curtidas, comentarios, salvamentos
+    SELECT seguidores, alcance, impressoes, curtidas, comentarios, salvamentos, criado_em
     FROM metrics
     ORDER BY id DESC
     LIMIT 1
@@ -40,6 +40,7 @@ def buscar_metricas():                                 # define a função que b
         seguidores=registro["seguidores"],
         alcance=registro["alcance"],
         impressoes=registro["impressoes"],
+        criado_em=registro["criado_em"],
         engajamento=Engajamento(
             curtidas=registro["curtidas"],
             comentarios=registro["comentarios"],
@@ -82,7 +83,7 @@ def buscar_historico(limit: int = 10):
     cursor = conn.cursor()                            # cria cursor para executar SQL
 
     cursor.execute("""
-    SELECT seguidores, alcance, impressoes, curtidas, comentarios, salvamentos
+    SELECT seguidores, alcance, impressoes, curtidas, comentarios, salvamentos,criado_em
     FROM metrics
     ORDER BY id DESC
     LIMIT ?
@@ -100,6 +101,7 @@ def buscar_historico(limit: int = 10):
                 seguidores=registro["seguidores"],
                 alcance=registro["alcance"],
                 impressoes=registro["impressoes"],
+                criado_em=registro["criado_em"],
                 engajamento=Engajamento(
                     curtidas=registro["curtidas"],
                     comentarios=registro["comentarios"],

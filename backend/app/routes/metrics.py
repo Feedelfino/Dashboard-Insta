@@ -15,7 +15,7 @@ from app.services.metrics_service import salvar_metricas
 
 # cria o roteador de métricas
 roteador_metricas = APIRouter()
-
+''
 
 # cria a rota GET /metrics
 @roteador_metricas.get("/metrics", response_model=MetricasResponse)

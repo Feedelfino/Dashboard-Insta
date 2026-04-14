@@ -1,5 +1,4 @@
-# importa a base para criar modelos Pydantic
-from pydantic import BaseModel
+from pydantic import BaseModel                         # importa a base para criar modelos Pydantic
 
 
 class Engajamento(BaseModel):                          # define o bloco de engajamento
@@ -8,25 +7,18 @@ class Engajamento(BaseModel):                          # define o bloco de engaj
     salvamentos: int                                   # total de salvamentos
 
 
-# define o modelo de resposta das métricas
-class MetricasResponse(BaseModel):
+class MetricasResponse(BaseModel):                     # define o modelo de resposta das métricas
     seguidores: int                                    # total de seguidores
     alcance: int                                       # total de alcance
     impressoes: int                                    # total de impressões
-    # bloco interno de engajamento
-    engajamento: Engajamento
+    criado_em: str                                     # data/hora em que o registro foi criado
+    engajamento: Engajamento                           # bloco interno de engajamento
 
 
-# define o modelo de entrada para criar métricas
-class MetricasCreate(BaseModel):
-                                                       # seguidores recebidos na requisição
-    seguidores: int
+class MetricasCreate(BaseModel):                       # define o modelo de entrada para criar métricas
+    seguidores: int                                    # seguidores recebidos na requisição
     alcance: int                                       # alcance recebido na requisição
-    # impressões recebidas na requisição
-    impressoes: int
-    # curtidas recebidas na requisição
-    curtidas: int
-    # comentários recebidos na requisição
-    comentarios: int
-    # salvamentos recebidos na requisição
-    salvamentos: int
+    impressoes: int                                    # impressões recebidas na requisição
+    curtidas: int                                      # curtidas recebidas na requisição
+    comentarios: int                                   # comentários recebidos na requisição
+    salvamentos: int                                   # salvamentos recebidos na requisição

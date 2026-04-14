@@ -2,6 +2,7 @@ from fastapi import FastAPI                            # importa o framework Fas
 from fastapi.middleware.cors import CORSMiddleware    # importa o middleware de CORS
 from app.config import configuracoes                  # importa as configurações do projeto
 from app.routes.metrics import roteador_metricas      # importa o roteador de métricas
+from app.routes.auth import roteador_auth              # importa o roteador de autenticação
 
 app = FastAPI(                                        # cria a aplicação principal
     title="Instagram Analytics API",                  # nome da API
@@ -18,6 +19,7 @@ app.add_middleware(                                   # adiciona middleware à a
 )
 
 app.include_router(roteador_metricas)                 # registra as rotas de métricas
+app.include_router(roteador_auth)                      # registra rotas de autenticação
 
 @app.get("/")                                         # rota GET na raiz
 async def raiz():                                     # função executada ao acessar /

@@ -13,7 +13,8 @@ def criar_tabela():                                    # função que cria a tab
         impressoes INTEGER,
         curtidas INTEGER,
         comentarios INTEGER,
-        salvamentos INTEGER
+        salvamentos INTEGER,
+        criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
     """)
 
@@ -31,7 +32,7 @@ def inserir_dados_iniciais():                          # função que insere um 
         curtidas, comentarios, salvamentos
     )
     VALUES (?, ?, ?, ?, ?, ?)
-    """, (1250, 8400, 13200, 320, 48, 27))            # insere os valores iniciais
+    """, (1250, 8400, 13200, 320, 48, 27))            # insere valores iniciais
 
     conn.commit()                                      # salva os dados inseridos
     conn.close()                                       # fecha conexão
@@ -40,3 +41,26 @@ def inserir_dados_iniciais():                          # função que insere um 
 if __name__ == "__main__":                             # executa quando rodar o arquivo como módulo
     criar_tabela()                                     # cria a tabela
     inserir_dados_iniciais()                           # insere os dados iniciais
+    
+    
+def criar_tabela_usuarios():                         # função que cria a tabela de usuários
+    conn = conectar_db()                             # abre conexão com o banco
+    cursor = conn.cursor()                           # cria cursor para executar SQL
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nome TEXT NOT NULL,
+        email TEXT NOT NULL UNIQUE,
+        senha_hash TEXT NOT NULL,
+        criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+    """)
+
+    conn.commit()                                    # salva criação da tabela
+    conn.close()                                     # fecha conexão
+
+if __name__ == "__main__":                           # executa quando rodar o arquivo como módulo
+    criar_tabela()                                   # cria a tabela metrics
+    criar_tabela_usuarios()                          # cria a tabela users
+    inserir_dados_iniciais()                         # insere os dados iniciais de metrics
