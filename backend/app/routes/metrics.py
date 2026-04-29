@@ -1,45 +1,76 @@
 # importa tipagem para listas
 from typing import List
-# importa a classe usada para agrupar rotas
-from fastapi import APIRouter
 
-from app.models.metrics import MetricasCreate          # importa o model de entrada
-# importa o model de resposta
+# importa recursos do FastAPI
+from fastapi import APIRouter, Depends, HTTPException
+
+# importa leitura de token bearer
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+
+# importa models de métricas
+from app.models.metrics import MetricasCreate
 from app.models.metrics import MetricasResponse
-# importa a função de histórico
+
+# importa funções do service de métricas
 from app.services.metrics_service import buscar_historico
-# importa a função de busca da métrica atual
 from app.services.metrics_service import buscar_metricas
-# importa a função de salvar métricas
 from app.services.metrics_service import salvar_metricas
 
-# cria o roteador de métricas
+# importa função que valida token JWT
+from app.services.security import verificar_token
+
+
+# cria roteador de métricas
 roteador_metricas = APIRouter()
-''
 
-# cria a rota GET /metrics
+# exige token bearer no header
+security = HTTPBearer()
+
+
+# função que valida usuário antes de abrir rota protegida
+def validar_usuario(
+    credenciais: HTTPAuthorizationCredentials = Depends(security)
+):
+    # pega somente token puro
+    token = credenciais.credentials
+
+    try:
+        # valida token
+        dados = verificar_token(token)
+
+        return dados
+
+    except:
+        # se token inválido bloqueia acesso
+        raise HTTPException(
+            status_code=401,
+            detail="Token inválido"
+        )
+
+
+# rota protegida - busca última métrica
 @roteador_metricas.get("/metrics", response_model=MetricasResponse)
-async def metrics():                                   # função executada ao acessar /metrics
-    # chama o service para buscar o último registro
+async def metrics(usuario=Depends(validar_usuario)):
+    # busca último registro
     dados = buscar_metricas()
-    return dados                                       # devolve os dados como resposta
+
+    return dados
 
 
-# cria a rota POST /metrics
+# rota para salvar novas métricas
 @roteador_metricas.post("/metrics")
-# recebe dados enviados no corpo da requisição
 async def criar_metricas(dados: MetricasCreate):
-    # chama o service para salvar os dados no banco
+    # salva dados no banco
     resultado = salvar_metricas(dados)
-    # devolve resposta de confirmação
+
     return resultado
 
 
+# rota histórico de métricas
 @roteador_metricas.get(
     "/metrics/historico",
     response_model=List[MetricasResponse]
-)                                                      # cria a rota GET /metrics/historico
-# recebe um limite opcional via query param
+)
 async def historico(limit: int = 10):
-    # chama o service para buscar o histórico
+    # busca histórico limitado
     return buscar_historico(limit)

@@ -1,26 +1,39 @@
-import bcrypt                                          # importa biblioteca de hash
-from app.database import conectar_db                   # importa função de conexão com o banco
-from app.models.auth import UserCreate                 # importa model de cadastro
+# importa biblioteca de hash
+import bcrypt
+# importa função de conexão com o banco
+from app.database import conectar_db
+# importa model de cadastro
+from app.models.auth import UserCreate
 from app.models.auth import UserLogin                  # importa model de login
+# importa função para gerar JWT
+from app.services.security import criar_token
 
 
-def gerar_hash_senha(senha: str) -> str:               # função que transforma senha em hash
-    senha_bytes = senha.encode("utf-8")                # converte texto para bytes
+# função que transforma senha em hash
+def gerar_hash_senha(senha: str) -> str:
+    # converte texto para bytes
+    senha_bytes = senha.encode("utf-8")
     salt = bcrypt.gensalt()                            # gera salt de segurança
     senha_hash = bcrypt.hashpw(senha_bytes, salt)      # cria hash da senha
-    return senha_hash.decode("utf-8")                  # retorna hash como texto
+    # retorna hash como texto
+    return senha_hash.decode("utf-8")
 
 
-def verificar_senha(senha: str, senha_hash: str) -> bool:   # compara senha digitada com hash salvo
+# compara senha digitada com hash salvo
+def verificar_senha(senha: str, senha_hash: str) -> bool:
     return bcrypt.checkpw(
-        senha.encode("utf-8"),                         # converte senha digitada para bytes
-        senha_hash.encode("utf-8")                     # converte hash salvo para bytes
+        # converte senha digitada para bytes
+        senha.encode("utf-8"),
+        # converte hash salvo para bytes
+        senha_hash.encode("utf-8")
     )
 
 
-def registrar_usuario(dados: UserCreate):              # função que registra usuário no banco
+# função que registra usuário no banco
+def registrar_usuario(dados: UserCreate):
     conn = conectar_db()                               # abre conexão com o banco
-    cursor = conn.cursor()                             # cria cursor para executar SQL
+    # cria cursor para executar SQL
+    cursor = conn.cursor()
 
     cursor.execute(
         "SELECT id FROM users WHERE email = ?",
@@ -33,7 +46,8 @@ def registrar_usuario(dados: UserCreate):              # função que registra u
         conn.close()                                   # fecha conexão
         return {"erro": "Email já cadastrado"}         # retorna erro simples
 
-    senha_hash = gerar_hash_senha(dados.senha)         # gera hash da senha antes de salvar
+    # gera hash da senha antes de salvar
+    senha_hash = gerar_hash_senha(dados.senha)
 
     cursor.execute("""
     INSERT INTO users (nome, email, senha_hash)
@@ -47,12 +61,15 @@ def registrar_usuario(dados: UserCreate):              # função que registra u
     conn.commit()                                      # salva inserção
     conn.close()                                       # fecha conexão
 
-    return {"mensagem": "Usuário cadastrado com sucesso"}   # resposta de sucesso
+    # resposta de sucesso
+    return {"mensagem": "Usuário cadastrado com sucesso"}
 
 
-def autenticar_usuario(dados: UserLogin):              # função que autentica usuário
+# função que autentica usuário
+def autenticar_usuario(dados: UserLogin):
     conn = conectar_db()                               # abre conexão com o banco
-    cursor = conn.cursor()                             # cria cursor para executar SQL
+    # cria cursor para executar SQL
+    cursor = conn.cursor()
 
     cursor.execute(
         "SELECT id, nome, email, senha_hash FROM users WHERE email = ?",
@@ -73,11 +90,14 @@ def autenticar_usuario(dados: UserLogin):              # função que autentica 
     if not senha_valida:                               # se senha estiver errada
         return {"erro": "Senha inválida"}
 
-    return {                                           # resposta básica de sucesso
-        "mensagem": "Login realizado com sucesso",
-        "usuario": {
-            "id": usuario["id"],
-            "nome": usuario["nome"],
-            "email": usuario["email"]
-        }
+    # gera token do usuário autenticado
+    token = criar_token({
+        "sub": usuario["email"],
+        "id": usuario["id"]
+    })
+
+    # retorna token de acesso
+    return {
+        "access_token": token,
+        "token_type": "bearer"
     }
