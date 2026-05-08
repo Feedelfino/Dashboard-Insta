@@ -44,29 +44,43 @@ localStorage.setItem('token', dados.access_token)
 
   return (
     <div style={styles.container}>
-      <div style={styles.card}>
-        <h1 style={styles.title}>Dashboard Insta Analytics</h1>
+      <div style={styles.visualPanel}>
+        <h2 style={styles.visualTitle}>Visualize seus dados com clareza</h2>
+        <p style={styles.visualText}>
+          Acompanhe métricas, evolução de seguidores e indicadores importantes em um dashboard intuitivo e fácil de usar.
+        </p>
 
-        <input
-          type="email"
-          placeholder="Seu e-mail"
-          style={styles.input}
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-
-        <input
-          type="password"
-          placeholder="Sua senha"
-          style={styles.input}
-          value={senha}
-          onChange={(e) => setSenha(e.target.value)}
-        />
-        <button style={styles.button} onClick={handleLogin}>
-          Entrar
-        </button>
+        <div style={styles.fakeChart}>
+          <div style={{ ...styles.bar, height: '45%' }} />
+          <div style={{ ...styles.bar, height: '70%' }} />
+          <div style={{ ...styles.bar, height: '55%' }} />
+          <div style={{ ...styles.bar, height: '85%' }} />
+          <div style={{ ...styles.bar, height: '65%' }} />
       </div>
     </div>
+
+    <div style={styles.card}>
+      <h1 style={styles.title}>Dashboard Insta Analytics</h1>
+  
+      <input
+        type='email'
+        placeholder='Seu E-mail'
+        style={styles.input}
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      />
+      <input
+        type='password'
+        placeholder='Sua Senha'
+        style={styles.input}
+        value={senha}
+        onChange={(e) => setSenha(e.target.value)}
+      />
+      <button style={styles.button} onClick={handleLogin}>
+        Entrar
+      </button>
+    </div>
+  </div>
   )
 }
 
@@ -79,6 +93,39 @@ const styles = {
     background: '#f4f6f8',
   },
 
+  visualPanel: {
+    width: '420px',
+    padding: '40px',
+    borderRadius: '20px',
+    background: '#111827',
+    color: '#fff',
+  },
+
+  visualTitle: {
+    fontSize: '32px',
+    marginBottom: '12px',
+  },
+
+  visualText: {
+    color: '#d1d5db',
+    fontSize: '16px',
+    lineHeight: '1.5',
+  },
+
+  fakeChart: {
+    height: '180px',
+    marginTop: '40px',
+    display: 'flex',
+    alignItems: 'end',
+    gap: '14px',
+  },
+
+  bar: {
+    width: '42px',
+    background: '#2563eb',
+    borderRadius: '10px 10px 0 0',
+  },
+  
   card: {
     background: '#ffffff',
     padding: '40px',
