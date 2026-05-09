@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { API_URL,getHeaders } from '../services/api'
 import { Navigate } from 'react-router-dom'
 import {LineChart,
         Line,
@@ -19,8 +20,7 @@ type Metric = {
 
 // Dashboard protegido por token
 function DashboardPage() {
-  const token = localStorage.getItem('token')
-
+  
   const [metric, setMetric] = useState<Metric | null>(null)
   const [loading, setLoading] = useState(true)
   const [historico, setHistorico] = useState<Metric[]>([])
@@ -32,11 +32,11 @@ function DashboardPage() {
   useEffect(() => {
     async function buscarMetricas() {
       try {
-        const resposta = await fetch('http://127.0.0.1:8000/metrics', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
+        const resposta = await fetch(`${API_URL}/metrics`, {
+
+          
+          headers: getHeaders(),
+      })
 
         const dados = await resposta.json()
 
@@ -50,11 +50,10 @@ function DashboardPage() {
         setMetric(dados)
 
      // Busca a lista para por no gráfico   
-        const respostaHistorico = await fetch('http://127.0.0.1:8000/metrics/historico', {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-     })
+        const respostaHistorico = await fetch(`${API_URL}/metrics/historico`, {
+      headers: getHeaders(),
+     
+      })
      
      
       const dadosHistorico = await respostaHistorico.json()
@@ -67,11 +66,11 @@ function DashboardPage() {
         setLoading(false)
       }
     }
-
-    if (token) {
       buscarMetricas()
-    }
-  }, [token])
+  
+  }, [])
+
+  const token = localStorage.getItem('token')
 
   if (!token) {
     return <Navigate to="/" replace />
@@ -171,7 +170,7 @@ const styles = {
 
   title: {
     fontSize: '32px',
-    marginBotton: '8px',
+    marginBottom: '8px',
   },
 
   subtitle: {
@@ -194,7 +193,7 @@ const styles = {
 
   cardValue: {
     fontSize: '32px',
-    fontWeigth: 'bold' as const,
+    fontWeight: 'bold' as const,
     margin: 0,
   },
 
@@ -205,7 +204,7 @@ const styles = {
     boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
     minWidth: '150px',
     display: 'flex',
-    flexDirection: 'column'as const,
+    flexDirection: 'column' as const,
     gap: '10px',
   },
 

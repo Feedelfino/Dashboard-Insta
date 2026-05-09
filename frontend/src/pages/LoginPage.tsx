@@ -1,4 +1,5 @@
 import {useState} from 'react'
+import { login } from '../services/api'
 
 function LoginPage() {
 
@@ -7,18 +8,7 @@ function LoginPage() {
 
 async function handleLogin() {
   try {
-    const resposta = await fetch('http://127.0.0.1:8000/auth/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        email,
-        senha,
-      }),
-    })
-
-    const dados = await resposta.json()
+    const { resposta, dados } = await login(email, senha)
 
     console.log('Resposta backend:', dados)
 
