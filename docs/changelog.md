@@ -31,3 +31,38 @@
 - Hierarquia visual
 - Debug de JSX
 - Estruturação de layout
+
+---
+
+# Refatoração de Arquitetura Frontend
+
+## Serviços e API
+
+- Criação da pasta `services`
+- Criação do arquivo `api.ts`
+- Centralização da URL base da API
+- Criação de função centralizada para headers HTTP
+- Centralização do gerenciamento de token JWT
+- Refatoração da autenticação para camada de serviço
+- Redução de acoplamento entre páginas e backend
+
+## LoginPage
+
+- Refatoração da lógica de login
+- Remoção de `fetch` direto da página
+- Integração da tela com função `login()` do `api.ts`
+
+## DashboardPage
+
+- Refatoração parcial das chamadas de API
+- Centralização dos headers de autenticação
+- Preparação estrutural para desacoplamento completo da página
+
+## Conceitos praticados
+
+- Separação de responsabilidades
+- Arquitetura frontend
+- Camada de serviços
+- Reutilização de código
+- Redução de duplicação
+- Organização de infraestrutura frontend

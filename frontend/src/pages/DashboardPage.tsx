@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react'
-import { API_URL,getHeaders } from '../services/api'
+import { 
+  buscarMetricas,
+  buscarHistoricoMetricas,
+  } from '../services/api'
 import { Navigate } from 'react-router-dom'
 import {LineChart,
         Line,
@@ -25,38 +28,25 @@ function DashboardPage() {
   const [loading, setLoading] = useState(true)
   const [historico, setHistorico] = useState<Metric[]>([])
 
+  function handLog() {
+    localStorage.removeItem('token')
+    window.location.href = '/'  //Manda o user para a tela de login
+  }
+
   function formatarData(data: string) {
     return new Date(data).toLocaleDateString('pt-BR')
   }
 
   useEffect(() => {
-    async function buscarMetricas() {
+    async function carregarDadosDashboard() {
       try {
-        const resposta = await fetch(`${API_URL}/metrics`, {
-
-          
-          headers: getHeaders(),
-      })
-
-        const dados = await resposta.json()
-
-        console.log('Dados recebidos:', dados)
-
-        if (!resposta.ok) {
-          alert('Erro ao buscar métricas')
-          return
-        }
+        const dados = await buscarMetricas()
+        console.log('Dados recebidos', dados)
 
         setMetric(dados)
 
      // Busca a lista para por no gráfico   
-        const respostaHistorico = await fetch(`${API_URL}/metrics/historico`, {
-      headers: getHeaders(),
-     
-      })
-     
-     
-      const dadosHistorico = await respostaHistorico.json()
+        const dadosHistorico = await buscarHistoricoMetricas()
         
         setHistorico(dadosHistorico)
 
@@ -66,7 +56,7 @@ function DashboardPage() {
         setLoading(false)
       }
     }
-      buscarMetricas()
+      carregarDadosDashboard()
   
   }, [])
 
@@ -82,10 +72,17 @@ function DashboardPage() {
       <div>
         <h1 style={styles.title}>Dashboard de Métricas</h1>
         <p style={styles.subtitle}>
-          Acompanhe os principais indicadores do perfil em tempo real.
+          Acompanhe os indicadores do perfil em tempo real.
           </p>
       </div>
-     </div> 
+
+      <button
+        style={styles.logoutButton}
+        onClick={handLog}
+      >
+        Sair
+      </button>
+    </div> 
 
       {loading && (
         <div style={styles.loadingBox}>
@@ -166,6 +163,9 @@ const styles = {
 
   header: {
     marginBottom: '30px',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
 
   title: {
@@ -177,6 +177,16 @@ const styles = {
     color: '#666',
     fontSize: '16px',
     margin: 0,
+  },
+
+  logoutButton: {
+    padding: '10px 28px',
+    border: 'none',
+    borderRadius: '8px',
+    background: '#ef4444',
+    color: '#fff',
+    cursor: 'pointer',
+    fontWeight: 'bold' as const,
   },
 
   grid: {

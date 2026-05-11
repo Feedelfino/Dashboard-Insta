@@ -35,8 +35,33 @@ function getHeaders() {
     }
  }
 
+    async function buscarMetricas(){
+
+        //Faz requisição GET para o endpoint de métricas
+        const resposta = await fetch (`${API_URL}/metrics`, {
+
+            //Usa headers centralizao da aplicação
+            headers: getHeaders(),
+        })
+
+        //Converte resposta da API para JSON
+        const dados = await resposta.json()
+
+        return dados
+    }
+
+    async function buscarHistoricoMetricas(){
+        const resposta =await fetch(`${API_URL}/metrics/historico`, {
+            headers: getHeaders(),
+        })
+        const dados = await resposta.json()
+        return dados
+    }
+
  export {
     API_URL,
     getHeaders,
     login,
+    buscarMetricas,
+    buscarHistoricoMetricas,
     }
